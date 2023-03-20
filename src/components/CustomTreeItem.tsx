@@ -42,23 +42,27 @@ const CustomTreeItem: React.FC<CustomTreeItemProps> = ({
   }
 
   return (
-    <TreeItem
-      nodeId={nodeId}
-      label={
-        <div>
-          <Checkbox
-            edge="start"
-            checked={checked}
-            onChange={handleCheck}
-            tabIndex={-1}
-            disableRipple
-          />
-          {type === 'file' ? <InsertDriveFile /> : <Folder />}
-          <span>{label}</span>
-        </div>
-      }
-      {...other}
-    />
+    <>
+      <TreeItem
+        nodeId={nodeId}
+        label={
+          <div>
+            {type === 'file' ? <InsertDriveFile /> : <Folder />}
+            <span>{label}</span>
+          </div>
+        }
+        {...other}
+      />
+      {type === 'file' ? (
+        <Checkbox
+          edge="start"
+          checked={checked}
+          onChange={handleCheck}
+          tabIndex={-1}
+          disableRipple
+        />
+      ) : null}
+    </>
   )
 }
 
