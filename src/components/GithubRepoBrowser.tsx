@@ -16,8 +16,10 @@ interface TreeData {
   children?: TreeData[]
 }
 
-const GitHubRepoBrowser: React.FC<GitHubRepoBrowserProps> = ({ repoUrl }) => {
+const GitHubRepoBrowser: React.FC<GitHubRepoBrowserProps> = () => {
   const [treeData, setTreeData] = useState<TreeData[]>([])
+  const [repoUrl, setRepoUrl] = useState<str>('hieutrluu/gpt4-repo-file-concat')
+  const [fetchRepo, setFetchRepo] = useState<boolean>(false)
 
   const handleCheck = (nodeId: string, checked: boolean) => {
     const updateSelect = (nodes: TreeData[]): TreeData[] => {
@@ -57,6 +59,11 @@ const GitHubRepoBrowser: React.FC<GitHubRepoBrowserProps> = ({ repoUrl }) => {
     })
   }
 
+  const pushFetchRepo = () => {
+    console.log('run push fetch repo')
+    setFetchRepo(true)
+  }
+
   const renderTree = (nodes: TreeData) => {
     return (
       <CustomTreeItem
@@ -74,6 +81,7 @@ const GitHubRepoBrowser: React.FC<GitHubRepoBrowserProps> = ({ repoUrl }) => {
   }
 
   useEffect(() => {
+    console.log('run UseEffect')
     let ignore = false
     const fetchContents = async (
       path = ''
@@ -93,7 +101,19 @@ const GitHubRepoBrowser: React.FC<GitHubRepoBrowserProps> = ({ repoUrl }) => {
           }
         })
 
-        return Promise.all(childrenPromises)
+        return Promise.all(childrenPromises).catch((err) => {
+          // return []
+          alert(err)
+        })
+        // .catch(function (err) {
+        //   // log that I have an error, return the entire array;
+        //   console.log('A promise failed to resolve', err)
+        //   // return []
+        // })
+        // .then(function (arrayOfPromises) {
+        //   // full array of resolved promises;
+        //   // return []
+        // })
       }
     }
     const fetchData = async () => {
@@ -107,12 +127,20 @@ const GitHubRepoBrowser: React.FC<GitHubRepoBrowserProps> = ({ repoUrl }) => {
 
     return () => {
       ignore = true
+      setFetchRepo(false)
     }
-  }, [repoUrl])
+  }, [fetchRepo])
 
+  // if (treeData.length && fetchRepo) {
   if (treeData.length) {
     return (
       <>
+        <input
+          type="text"
+          value={repoUrl}
+          onChange={(e) => setRepoUrl(e.target.value)}
+        />
+        <Button onClick={pushFetchRepo}>Fetch Repo</Button>
         <TreeView
           className="tree-view"
           defaultCollapseIcon={<Folder />}
@@ -121,18 +149,21 @@ const GitHubRepoBrowser: React.FC<GitHubRepoBrowserProps> = ({ repoUrl }) => {
         >
           {treeData.map((data) => renderTree(data))}
         </TreeView>
-        <button
-          // variant="contained"
-          onClick={() => {
-            console.log(getSelect())
-          }}
-        >
-          Download selected file
-        </button>
+        <Button onClick={getSelect}>Download</Button>
       </>
     )
   } else {
-    return <h1>Loading...</h1>
+    return (
+      <>
+        <input
+          type="text"
+          value={repoUrl}
+          onChange={(e) => setRepoUrl(e.target.value)}
+        />
+        <Button onClick={pushFetchRepo}>Fetch Repo</Button>
+        <h1> Loading... </h1>
+      </>
+    )
   }
 }
 
